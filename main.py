@@ -5,6 +5,12 @@ import global_hotkeys
 import pyperclip
 import keyboard
 
+# Visit https://www.mybib.com/ to get supported types
+citation_type = 'apa-7th-edition'
+
+cite_hotkey = "control + alt + c"
+incite_hotkey = "control + alt + shift + c"
+
 delay = 0.5
 _cache = {}
 
@@ -48,6 +54,7 @@ def get_citation_text(citation, style: str = 'apa-7th-edition') -> tuple[str, st
 
 
 def on_activate(incite: bool):
+    print()
     print(f"{'in' if incite else ''}cite activated")
 
     # save clipboard to be restored later
@@ -68,9 +75,9 @@ def on_activate(incite: bool):
     # process clipboard (get citation)
     try:
         citation = get_citation(clipboard)
-        ref, inr = get_citation_text(citation)
-    except:
-        print('error getting citation')
+        ref, inr = get_citation_text(citation, citation_type)
+    except Exception as e:
+        print(f'{e}')
         # restore clipboard
         pyperclip.copy(og_clip)
         return
@@ -92,11 +99,6 @@ def on_activate(incite: bool):
     pyperclip.copy(og_clip)
 
 
-# register the hotkey
-cite_hotkey = "control + alt + c"
-incite_hotkey = "control + alt + shift + c"
-
-
 def on_cite_activate():
     on_activate(False)
 
@@ -105,18 +107,19 @@ def on_incite_activate():
     on_activate(True)
 
 
-bindings = [
-    [cite_hotkey, None, on_cite_activate, True],
-    [incite_hotkey, None, on_incite_activate, True],
-]
+if __name__ == '__main__':
+    bindings = [
+        [cite_hotkey, None, on_cite_activate, True],
+        [incite_hotkey, None, on_incite_activate, True],
+    ]
 
-global_hotkeys.register_hotkeys(bindings)
+    global_hotkeys.register_hotkeys(bindings)
 
-global_hotkeys.start_checking_hotkeys()
+    global_hotkeys.start_checking_hotkeys()
 
-print("Press Ctrl+Alt+C to get citation")
-print("Press Ctrl+Alt+Shift+C to get in-text citation")
+    print(f"Press {cite_hotkey} to get citation")
+    print(f"Press {incite_hotkey} to get in-text citation")
 
-# Block
-while True:
-    time.sleep(0.1)
+    # Block
+    while True:
+        time.sleep(0.1)
